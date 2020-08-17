@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ItemAdapter
     private val compositeDisposable = CompositeDisposable()
     private lateinit var manager: LinearLayoutManager
-    private var doubleCallAPI: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +69,6 @@ class MainActivity : AppCompatActivity() {
             val totalItemCount = recyclerView.layoutManager?.itemCount
             val firstVisible = manager.findLastVisibleItemPosition()
             if (totalItemCount == (firstVisible + 1)) {
-                Log.d("<S", "========onScrollStateChanged======>$doubleCallAPI")
                 LoadMore()
             }
         }
@@ -78,12 +76,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getSearch() {
-        RxTextView.textChanges(edt )
+        RxTextView.textChanges(edtSearch)
             .map(CharSequence::toString)
             .debounce(500, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
             .flatMap { txt ->
-                Log.d("<S", "========txt======>${txt}")
                 return@flatMap searchViewModel.getSearch(txt, 20)
             }
             .subscribeOn(Schedulers.computation())
@@ -105,7 +102,6 @@ class MainActivity : AppCompatActivity() {
             20
         ).subscribeBy(
             onNext = {
-                Log.d("<S", "========size======>${it.size}")
                 if (it.size != 0) adapter.setData(it)
             }, onError = {
                 it.printStackTrace()
