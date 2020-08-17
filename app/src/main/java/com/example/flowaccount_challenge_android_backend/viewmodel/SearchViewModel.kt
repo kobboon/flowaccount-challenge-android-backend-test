@@ -12,8 +12,6 @@ class SearchViewModel : ViewModel() {
 
     private val service = SearchService()
 
-    private var isMore: Boolean = true
-
     fun getSearch(textSearch: String, count: Int): Observable<ArrayList<SearchModel.Items>> {
         return if (textSearch != "") {
             service.getSearch(textSearch, count).map {
@@ -23,11 +21,6 @@ class SearchViewModel : ViewModel() {
             Observable.just(arrayListOf())
         }
 
-    }
-
-
-    fun resetCount() {
-        isMore = true
     }
 
 }
