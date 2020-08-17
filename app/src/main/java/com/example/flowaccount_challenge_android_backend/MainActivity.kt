@@ -1,7 +1,6 @@
 package com.example.flowaccount_challenge_android_backend
 
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -12,9 +11,9 @@ import com.example.flowaccount_challenge_android_backend.adapter.ItemAdapter
 import com.example.flowaccount_challenge_android_backend.util.ViewModelProvider
 import com.example.flowaccount_challenge_android_backend.viewmodel.SearchViewModel
 import com.jakewharton.rxbinding2.widget.RxTextView
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -32,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ItemAdapter
     private val compositeDisposable = CompositeDisposable()
     private lateinit var manager: LinearLayoutManager
-    private var doubleCallAPI: Boolean = false
+    private var doubleCallAPI: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.addOnScrollListener(scrollListener)
         getSearch()
+        LoadMore()
     }
 
 
@@ -71,39 +71,45 @@ class MainActivity : AppCompatActivity() {
             val firstVisible = manager.findLastVisibleItemPosition()
             if (totalItemCount == (firstVisible + 1)) {
                 Log.d("<S", "========onScrollStateChanged======>$doubleCallAPI")
-                if (doubleCallAPI) {
-                    doubleCallAPI = false
-                    Handler().postDelayed({ searchViewModel.setOnPage() }, 1000)
-                }
+                LoadMore()
             }
         }
 
     }
 
     private fun getSearch() {
-        RxTextView.textChanges(edtSearch)
+        RxTextView.textChanges(edt )
             .map(CharSequence::toString)
-            .debounce(1000, TimeUnit.MILLISECONDS)
+            .debounce(500, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
             .flatMap { txt ->
-                searchViewModel.resetCount()
-                return@flatMap searchViewModel.countSearch()
-                    .flatMap { count ->
-                        return@flatMap searchViewModel.getSearch(txt, count).toObservable()
-                    }
+                Log.d("<S", "========txt======>${txt}")
+                return@flatMap searchViewModel.getSearch(txt, 20)
             }
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = {
-                    doubleCallAPI = true
-                    Log.d("<S", "========hhhhh======>${it.size}")
-                    adapter.setData(it)
+                    if (it.size != 0) adapter.setDataNew(it)
                 },
                 onError = {
                     it.printStackTrace()
                 }
             )
+            .addTo(compositeDisposable)
+    }
+
+    private fun LoadMore() {
+        searchViewModel.getSearch(
+            edtSearch.text.toString(),
+            20
+        ).subscribeBy(
+            onNext = {
+                Log.d("<S", "========size======>${it.size}")
+                if (it.size != 0) adapter.setData(it)
+            }, onError = {
+                it.printStackTrace()
+            })
             .addTo(compositeDisposable)
     }
 }

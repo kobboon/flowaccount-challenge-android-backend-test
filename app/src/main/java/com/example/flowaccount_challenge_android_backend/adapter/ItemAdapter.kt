@@ -52,6 +52,13 @@ class ItemAdapter(private var context: Context) : RecyclerView.Adapter<ItemAdapt
 
 
     fun setData(list: ArrayList<SearchModel.Items>) {
+        this.list.addAll(list)
+        notifyDataSetChanged()
+    }
+
+
+    fun setDataNew(list: ArrayList<SearchModel.Items>) {
+        this.list.clear()
         this.list = list
         notifyDataSetChanged()
     }
