@@ -14,7 +14,7 @@ class SearchService {
     fun getSearch(textSearch: String, count: Int): Single<ArrayList<SearchModel.Items>> {
         return Single.create {
 
-            val service = BuildServiceRetrofit.create().getSearch(textSearch, count)
+            val service = BuildServiceRetrofit.create().getSearch("$textSearch&per_page=$count")
             service.enqueue(object : Callback<ResponseBody> {
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     it.onError(t)
@@ -26,7 +26,7 @@ class SearchService {
                 ) {
                     if (response.isSuccessful) {
                         val res = response.body()?.string()
-                        Log.d("<S","======>$res")
+                        Log.d("<S", "======>$res")
                         val model = Gson().fromJson(res!!, SearchModel::class.java)
                         it.onSuccess(model.items)
                     } else {

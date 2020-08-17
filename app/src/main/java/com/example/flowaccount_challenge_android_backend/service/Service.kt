@@ -9,7 +9,6 @@ interface Service {
 
     @GET("search/repositories")
     fun getSearch(
-        @Query("q") textSearch: String,
-        @Query("per_page") count: Int
+        @Query("q") textSearch: String
     ): Call<ResponseBody>
 }

@@ -9,11 +9,10 @@ import io.reactivex.subjects.BehaviorSubject
 class SearchViewModel : ViewModel() {
 
     private val service = SearchService()
-
-
     private val listSearch: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    private var count: Int = 20
 
-    fun getSearch(textSearch: String, count: Int): Single<ArrayList<SearchModel.Items>> {
+    fun getSearch(textSearch: String): Single<ArrayList<SearchModel.Items>> {
         return service.getSearch(textSearch, count)
     }
 

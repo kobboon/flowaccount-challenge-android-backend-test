@@ -53,6 +53,10 @@ dependencies {
     implementation 'io.reactivex:rxkotlin:2.0.0-RC1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.14'
 
+    // Rx Bindig
+    implementation "com.jakewharton.rxbinding2:rxbinding:2.0.0"
+    implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:2.0.0"
+
     // Image
     implementation 'com.github.bumptech.glide:glide:4.9.0'
 }
