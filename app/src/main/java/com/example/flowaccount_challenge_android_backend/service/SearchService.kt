@@ -11,10 +11,12 @@ import retrofit2.Response
 
 class SearchService {
 
-    fun getSearch(textSearch: String, count: Int): Single<ArrayList<SearchModel.Items>> {
+    fun getSearch(textSearch: String, count: Int): Single<SearchModel> {
         return Single.create {
 
-            val service = BuildServiceRetrofit.create().getSearch("$textSearch&per_page=$count")
+//            val service = BuildServiceRetrofit.create().getSearch("$textSearch&per_page=$count")
+            val service = BuildServiceRetrofit.create().getSearch(textSearch, count)
+            Log.d("<S", "======>${service.request().url()}")
             service.enqueue(object : Callback<ResponseBody> {
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     it.onError(t)
@@ -28,7 +30,7 @@ class SearchService {
                         val res = response.body()?.string()
                         Log.d("<S", "======>$res")
                         val model = Gson().fromJson(res!!, SearchModel::class.java)
-                        it.onSuccess(model.items)
+                        it.onSuccess(model)
                     } else {
                         it.onError(Exception(response.errorBody()?.string()))
                     }
